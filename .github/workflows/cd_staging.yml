@@ -20,6 +20,11 @@ jobs:
           echo "${{ secrets.KNOWN_HOSTS }}" &> /home/runner/.ssh/known_hosts
           chmod 700 /home/runner/ssh_key
           # SSH and run all deployment commands
+          #   # GitHub Actions can’t see node installed via NVM
+          #   export NVM_DIR="$HOME/.nvm"
+          # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
+          # nvm use 22.13.1
+          #or use below approach
           ssh -i ~/ssh_key root@64.227.147.124 << 'EOF'
             echo "Pulling latest code..."
             cd week-25-ci-next-app/
