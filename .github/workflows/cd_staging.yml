@@ -26,7 +26,7 @@ jobs:
           # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
           # nvm use 22.13.1
           #or use below approach
-          ssh -i ~/ssh_key root@64.227.147.124 << 'EOF'
+          ssh -i ~/ssh_key root@4.240.92.232 << 'EOF'
             echo "Pulling latest code..."
             cd week-25-ci-next-app/
             git pull origin main
