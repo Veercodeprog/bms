@@ -24,7 +24,7 @@ jobs:
             echo "Pulling latest code..."
             cd week-25-ci-next-app/
             git pull origin main
-          source export PATH=/root/.nvm/versions/node/v22.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+            export PATH=/root/.nvm/versions/node/v22.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 
             echo "Installing dependencies..."
             npm install -g pnpm
