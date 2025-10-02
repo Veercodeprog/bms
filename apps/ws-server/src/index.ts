@@ -2,7 +2,7 @@ import { WebSocketServer } from "ws";
 import { client } from "@repo/db/client";
 const server = new WebSocketServer({
   port: 3001,
-   host: '0.0.0.0',
+  host: "0.0.0.0",
 });
 
 server.on("connection", async (socket) => {
@@ -15,5 +15,5 @@ server.on("connection", async (socket) => {
 
   console.log(res);
 
-  socket.send("hi there you are connected to the server");
+  socket.send("hi there hello you are connected to the server");
 });
