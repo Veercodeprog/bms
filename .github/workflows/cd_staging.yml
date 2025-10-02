@@ -14,36 +14,39 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup SSH and deploy
-  run: |
-    # Create SSH directory
-    mkdir -p ~/.ssh
+        run: |
+          # Create SSH directory
+          mkdir -p ~/.ssh
 
-    # Write private key safely
-    cat <<'EOF' > ~/ssh_key
-    ${{ secrets.SSH_PRIVATE_KEY }}
-     EOF
-    chmod 600 ~/ssh_key
+          # Write private key safely
+          cat <<EOF > ~/ssh_key
+          ${{ secrets.SSH_PRIVATE_KEY }}
+          EOF
+          chmod 600 ~/ssh_key
 
-    # SSH and deploy
-    ssh -i ~/ssh_key -o StrictHostKeyChecking=no azureuser@4.240.92.232 << 'DEPLOY'
-      echo "Pulling latest code..."
-      cd week-25-ci-next-app/
-      git pull origin main
+          echo "==== SSH Key Contents ===="
+             cat ~/ssh_key
+          echo "========================="
 
-      # Load node from NVM
-      export PATH=/home/azureuser/.nvm/versions/node/v22.13.1/bin:$PATH
+          # SSH and deploy
+          ssh -i ~/ssh_key -o StrictHostKeyChecking=no azureuser@4.240.92.232 << 'DEPLOY'
+            echo "Pulling latest code..."
+            cd week-25-ci-next-app/
+            git pull origin main
 
-      echo "Installing dependencies..."
-      npm install -g pnpm
-      pnpm install
+            # Load node from NVM
+            export PATH=/home/azureuser/.nvm/versions/node/v22.13.1/bin:$PATH
 
-      echo "Building project..."
-      pnpm run build
+            echo "Installing dependencies..."
+            npm install -g pnpm
+            pnpm install
 
-      echo "Restarting servers..."
-      pm2 restart fe-server
-      pm2 restart http-server
-      pm2 restart ws-server
-DEPLOY
-  shell: bash
+            echo "Building project..."
+            pnpm run build
 
+            echo "Restarting servers..."
+            pm2 restart fe-server
+            pm2 restart http-server
+            pm2 restart ws-server
+          DEPLOY
+        shell: bash
