@@ -25,7 +25,7 @@ jobs:
           chmod 600 ~/ssh_key
 
           # SSH and deploy
-          ssh -i ~/ssh_key -o StrictHostKeyChecking=no azureuser@4.240.92.232 << 'DEPLOY'
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} -o StrictHostKeyChecking=no azureuser@4.240.92.232 << 'DEPLOY'
             echo "Pulling latest code..."
             cd week-25-ci-next-app/
             git pull origin main
