@@ -24,6 +24,7 @@ jobs:
             echo "Pulling latest code..."
             cd week-25-ci-next-app/
             git pull origin main
+            source ~/.bashrc
 
             echo "Installing dependencies..."
             npm install -g pnpm
