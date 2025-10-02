@@ -10,14 +10,29 @@ jobs:
     name: Deploying everything to the staging cluster
 
     steps:
-      - name: SSH into server and deploy
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Save SSH private key
         run: |
-          # this echo command takes the key and add it to the file name agter &>
-          echo ${{ secrets.SSH_PRIVATE_KEY }} &> ~/ssh_key
-          ssh -i ~/ssh_key root@64.227.147.124
-          cd week-25-ci-next-app/ && git pull
-          pnpm install
-          pnpm run build
-          pm2 restart fe-server
-          pm2 restart http-server
-          pm2 restart ws-server
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
+          chmod 600 ~/ssh_key
+
+      - name: SSH and deploy everything
+        run: |
+          ssh -i ~/ssh_key root@64.227.147.124 << 'EOF'
+            echo "Step 1: Pull latest code"
+            cd week-25-ci-next-app/
+            git pull
+
+            echo "Step 2: Install dependencies"
+            pnpm install
+
+            echo "Step 3: Build project"
+            pnpm run build
+
+            echo "Step 4: Restart servers"
+            pm2 restart fe-server
+            pm2 restart http-server
+            pm2 restart ws-server
+          EOF
