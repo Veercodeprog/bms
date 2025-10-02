@@ -27,4 +27,6 @@ app.get("/", (req, res) => {
   res.send("Hi There");
 });
 
-app.listen(3002);
+app.listen(3002, '0.0.0.0', () => {
+  console.log('Web app running on port 3002');
+});

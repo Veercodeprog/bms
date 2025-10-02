@@ -13,6 +13,7 @@ jobs:
       - name: SSH into server and deploy
         run: |
           # this echo command takes the key and add it to the file name agter &>
+          # also we can go for strict no host keychecking then we have to check for known hosts
           echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
           mkdir -p /home/runner/.ssh
           ls /home/runner/.ssh
