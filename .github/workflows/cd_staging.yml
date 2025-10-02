@@ -21,11 +21,12 @@ jobs:
           ssh-keyscan -H 64.227.147.124 >> ~/.ssh/known_hosts
 
           # SSH and deploy
-          ssh -i ~/ssh_key root@64.227.147.124
-          cd week-25-ci-next-app/
-          git pull
+          ssh -i ~/ssh_key root@64.227.147.124 << 'EOF'
+            cd week-25-ci-next-app/
+            git pull
             pnpm install
             pnpm run build
             pm2 restart fe-server
             pm2 restart http-server
             pm2 restart ws-server
+          EOF
