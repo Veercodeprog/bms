@@ -10,32 +10,27 @@ jobs:
     name: Deploying everything to the staging cluster
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup SSH and deploy
+      - name: SSH into server and deploy
         run: |
-          # Create SSH directory
-          mkdir -p ~/.ssh
-
-          # Write private key safely
-          cat <<EOF > ~/ssh_key
-          ${{ secrets.SSH_PRIVATE_KEY }}
-          EOF
-          chmod 600 ~/ssh_key
-
-          echo "==== SSH Key Contents ===="
-             cat ~/ssh_key
-          echo "========================="
-
-          # SSH and deploy
-          ssh -i ~/ssh_key -o StrictHostKeyChecking=no azureuser@4.240.92.232 << 'DEPLOY'
+          # this echo command takes the key and add it to the file name agter &>
+          # also we can go for strict no host keychecking then we have to check for known hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
+          mkdir -p /home/runner/.ssh
+          ls /home/runner/.ssh
+          touch /home/runner/.ssh/known_hosts
+          echo "${{ secrets.KNOWN_HOSTS }}" &> /home/runner/.ssh/known_hosts
+          chmod 700 /home/runner/ssh_key
+          # SSH and run all deployment commands
+          #   # GitHub Actions can’t see node installed via NVM
+          #   export NVM_DIR="$HOME/.nvm"
+          # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Load nvm
+          # nvm use 22.13.1
+          #or use below approach
+          ssh -i ~/ssh_key root@4.240.92.232 << 'EOF'
             echo "Pulling latest code..."
             cd week-25-ci-next-app/
             git pull origin main
-
-            # Load node from NVM
-            export PATH=/home/azureuser/.nvm/versions/node/v22.13.1/bin:$PATH
+            export PATH=/root/.nvm/versions/node/v22.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 
             echo "Installing dependencies..."
             npm install -g pnpm
@@ -48,5 +43,4 @@ jobs:
             pm2 restart fe-server
             pm2 restart http-server
             pm2 restart ws-server
-          DEPLOY
-        shell: bash
+          EOF
