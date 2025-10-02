@@ -23,9 +23,10 @@ jobs:
           ssh -i ~/ssh_key root@64.227.147.124 << 'EOF'
             echo "Pulling latest code..."
             cd week-25-ci-next-app/
-            git pull
+            git pull origin main
 
             echo "Installing dependencies..."
+            npm install -g pnpm
             pnpm install
 
             echo "Building project..."
