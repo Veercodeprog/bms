@@ -1,45 +1,61 @@
+---
 name: Deployment to staging
-
 on:
   push:
-    branches: [main]
-
+    branches:
+      - main
 jobs:
   redeploy_everything:
     runs-on: ubuntu-latest
     name: Deploying everything to the staging cluster
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Setup SSH and deploy
-        run: |
+        run: >
           # Create SSH directory
+
           mkdir -p ~/.ssh
+
           # Write private key safely
+
           cat <<EOF > ~/ssh_key
+
           ${{ secrets.SSH_PRIVATE_KEY }}
+
           EOF
+
           chmod 600 ~/ssh_key
+
           echo "==== SSH Key Contents ===="
              cat ~/ssh_key
           echo "========================="
+
           # SSH and deploy
+
           ssh -i ~/ssh_key -o StrictHostKeyChecking=no azureuser@4.240.92.232 << 'DEPLOY'
             echo "Pulling latest code..."
-            cd bms/
-            git pull origin main
-            # Load node from NVM
-            export PATH=/home/azureuser/.nvm/versions/node/v22.13.1/bin:$PATH
+            cd ~/bms || git clone https://github.com/Veercodeprog/bms.git ~/bms
+            cd ~/bms
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Loading Node/NVM..."
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm use 22.20.0
+
             echo "Installing dependencies..."
-            npm install -g pnpm
+            npm install -g pnpm pm2
             pnpm install
+
             echo "Building project..."
             pnpm run build
+
             echo "Restarting servers..."
-            pm2 restart fe-server
-            pm2 restart http-server
-            pm2 restart ws-server
+            pm2 restart fe-server || pm2 start pnpm --name fe-server -- run start
+            pm2 restart http-server || pm2 start pnpm --name http-server -- run start
+            pm2 restart ws-server || pm2 start pnpm --name ws-server -- run start
+
           DEPLOY
-        shell: bash
+            shell: bash
